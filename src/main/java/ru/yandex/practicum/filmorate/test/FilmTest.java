@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 import static org.junit.Assert.*;
 
-public class FilmTest<T extends Film> {
+public class FilmTest {
     @Test
     public void shouldValidate() {
         Film film = new Film(1, "", "description",

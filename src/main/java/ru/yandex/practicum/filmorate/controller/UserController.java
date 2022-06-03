@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -23,7 +22,7 @@ public class UserController {
     public User create(@RequestBody User user) {
         try {
             User.validateUser(user);
-            if(users.containsValue(user)) {
+            if (users.containsValue(user)) {
                 throw new ValidationException("Такой пользователь уже зарегистрирован.");
             }
             if (users.containsKey(user.getId())) {
@@ -33,7 +32,7 @@ public class UserController {
             users.put(user.getId(), user);
             log.debug("Пользователь добавлен: {}", user);
             return user;
-        } catch(ValidationException e) {
+        } catch (ValidationException e) {
             log.debug("Возникла ошибка: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -46,13 +45,13 @@ public class UserController {
             if (!users.containsKey(user.getId())) {
                 throw new ValidationException("Пользователя с таким id не существует.");
             }
-            if(users.containsValue(user)) {
+            if (users.containsValue(user)) {
                 throw new ValidationException("В переданной информации нет данных для обновления.");
             }
             users.put(user.getId(), user);
             log.debug("Пользователь обновлён: {}", user);
             return user;
-        } catch(ValidationException e) {
+        } catch (ValidationException e) {
             log.debug("Возникла ошибка: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }

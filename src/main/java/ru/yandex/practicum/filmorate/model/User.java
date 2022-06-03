@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+
 import java.time.LocalDate;
 
 @Data
@@ -15,7 +16,7 @@ public class User {
     private LocalDate birthday;
 
     public static void validateUser(User user) {
-        if (user.getLogin() == null || user.getLogin().contains(" ") ||user.getLogin().isBlank()) {
+        if (user.getLogin() == null || user.getLogin().contains(" ") || user.getLogin().isBlank()) {
             throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
         }
         if (user.getEmail() == null || !user.getEmail().contains("@")) {

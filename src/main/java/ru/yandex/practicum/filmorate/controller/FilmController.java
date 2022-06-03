@@ -30,7 +30,7 @@ public class FilmController {
             films.put(film.getId(), film);
             log.debug("Фильм добавлен: {}", film);
             return film;
-        } catch(ValidationException e) {
+        } catch (ValidationException e) {
             log.debug("Возникла ошибка: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -49,7 +49,7 @@ public class FilmController {
             films.put(film.getId(), film);
             log.debug("Фильм обновлён: {}", film);
             return film;
-        } catch(ValidationException e) {
+        } catch (ValidationException e) {
             log.debug("Возникла ошибка: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }

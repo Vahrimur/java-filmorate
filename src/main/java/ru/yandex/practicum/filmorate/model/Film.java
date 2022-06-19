@@ -5,6 +5,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -15,6 +17,7 @@ public class Film {
     private String description; //описание
     private LocalDate releaseDate; //дата релиза
     private int duration; //продолжительность фильма
+    private Set<Long> userLikes; // список с неповторяющимися (по ТЗ) лайками пользователей
 
     public static void validateFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
@@ -28,6 +31,9 @@ public class Film {
         }
         if (film.getDuration() < 0) {
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
+        }
+        if (film.getUserLikes() == null) {
+            film.setUserLikes(new HashSet<>());
         }
     }
 }

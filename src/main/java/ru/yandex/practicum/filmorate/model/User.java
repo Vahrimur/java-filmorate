@@ -5,6 +5,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +15,8 @@ public class User {
     private String email; //электронная почта, в будущем при изменении email нужно заменить элемент юзера в мапе
     private String login; // логин пользователя
     private String name; // имя для отображения
-    private LocalDate birthday;
+    private LocalDate birthday; //день рождения
+    private Set<Long> friends; // список с неповторяющимися (по ТЗ) id друзей пользователя
 
     public static void validateUser(User user) {
         if (user.getLogin() == null || user.getLogin().contains(" ") || user.getLogin().isBlank()) {
@@ -27,6 +30,9 @@ public class User {
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Дата рождения не может быть в будущем.");
+        }
+        if (user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
         }
     }
 }

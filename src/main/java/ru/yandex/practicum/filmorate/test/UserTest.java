@@ -12,7 +12,7 @@ public class UserTest {
     @Test
     public void shouldValidate() {
         User user = new User(1, "email@yandex.ru", "", "name",
-                LocalDate.of(1991, 6, 22));
+                LocalDate.of(1991, 6, 22), null);
         ValidationException ex1 = assertThrows(
                 ValidationException.class,
                 () -> User.validateUser(user)

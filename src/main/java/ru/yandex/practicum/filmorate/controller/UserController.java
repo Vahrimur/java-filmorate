@@ -33,7 +33,7 @@ public class UserController {
     @PutMapping //обновление пользователя
     public User update(@RequestBody User user) {
         if (user.getId() < 0) {
-            throw new IllegalArgumentException("Введён некорректный id.");
+            throw new ValidationException("Введён некорректный id.");
         }
         User.validateUser(user);
         User updatedUser = userService.getUserStorage().updateUser(user);

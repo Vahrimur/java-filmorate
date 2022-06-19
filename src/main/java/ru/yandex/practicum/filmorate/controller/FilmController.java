@@ -32,7 +32,7 @@ public class FilmController {
     @PutMapping //обновление фильма
     public Film update(@RequestBody Film film) {
         if (film.getId() < 0) {
-            throw new IllegalArgumentException("Введён некорректный id.");
+            throw new ValidationException("Введён некорректный id.");
         }
         Film.validateFilm(film);
         Film updatedFilm = filmService.getFilmStorage().updateFilm(film);

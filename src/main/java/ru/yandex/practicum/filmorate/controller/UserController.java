@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
 import java.util.Set;
@@ -16,16 +17,18 @@ import java.util.Set;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final UserStorage userStorage;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserStorage userStorage) {
         this.userService = userService;
+        this.userStorage = userStorage;
     }
 
     @PostMapping //создание пользователя
     public User create(@RequestBody User user) {
         User.validateUser(user);
-        User addedUser = userService.getUserStorage().addUser(user);
+        User addedUser = userStorage.addUser(user);
         log.debug("Пользователь добавлен: {}", addedUser);
         return addedUser;
     }
@@ -36,7 +39,7 @@ public class UserController {
             throw new RuntimeException("Введён некорректный id.");
         }
         User.validateUser(user);
-        User updatedUser = userService.getUserStorage().updateUser(user);
+        User updatedUser = userStorage.updateUser(user);
         log.debug("Пользователь обновлён: {}", updatedUser);
         return updatedUser;
     }
@@ -49,17 +52,17 @@ public class UserController {
 
     @GetMapping //получение списка всех пользователей
     public Collection<User> findAll() {
-        Collection<User> users = userService.getUserStorage().findAllUsers();
+        Collection<User> users = userStorage.findAllUsers();
         log.debug("Текущее количество пользователей: {}", users.size());
         return users;
     }
 
     @GetMapping("/{userId}") //получение пользователя по id
     public User findById(@PathVariable long userId) {
-        if (!(userService.getUserStorage().getUsers().containsKey(userId))) {
+        if (!(userStorage.getUsers().containsKey(userId))) {
             throw new IllegalArgumentException("Введён некорректный id.");
         }
-        User user = userService.getUserStorage().getUsers().get(userId);
+        User user = userStorage.getUsers().get(userId);
         log.debug("Получен пользователь: {}", user);
         return user;
     }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.*;
 
@@ -15,16 +16,18 @@ import java.util.*;
 @Slf4j
 public class FilmController {
     private final FilmService filmService;
+    private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, FilmStorage filmStorage) {
         this.filmService = filmService;
+        this.filmStorage = filmStorage;
     }
 
     @PostMapping() //добавление фильма
     public Film create(@RequestBody Film film) {
         Film.validateFilm(film);
-        Film addedFilm = filmService.getFilmStorage().addFilm(film);
+        Film addedFilm = filmStorage.addFilm(film);
         log.debug("Фильм добавлен: {}", addedFilm);
         return addedFilm;
     }
@@ -35,7 +38,7 @@ public class FilmController {
             throw new RuntimeException("Введён некорректный id.");
         }
         Film.validateFilm(film);
-        Film updatedFilm = filmService.getFilmStorage().updateFilm(film);
+        Film updatedFilm = filmStorage.updateFilm(film);
         log.debug("Фильм обновлён: {}", updatedFilm);
         return updatedFilm;
     }
@@ -48,17 +51,17 @@ public class FilmController {
 
     @GetMapping() //получение всех фильмов
     public Collection<Film> findAll() {
-        Collection<Film> films = filmService.getFilmStorage().findAllFilms();
+        Collection<Film> films = filmStorage.findAllFilms();
         log.debug("Текущее количество фильмов: {}", films.size());
         return films;
     }
 
     @GetMapping("/{filmId}") //получение фильма по id
     public Film findById(@PathVariable long filmId) {
-        if (!(filmService.getFilmStorage().getFilms().containsKey(filmId))) {
+        if (!(filmStorage.getFilms().containsKey(filmId))) {
             throw new IllegalArgumentException("Введён некорректный id.");
         }
-        Film film = filmService.getFilmStorage().getFilms().get(filmId);
+        Film film = filmStorage.getFilms().get(filmId);
         log.debug("Получен фильм: {}", film);
         return film;
     }

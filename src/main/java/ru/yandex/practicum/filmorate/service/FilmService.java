@@ -73,12 +73,4 @@ public class FilmService {
             return (ArrayList<Film>) popularFilms.stream().limit(count).collect(Collectors.toList());
         }
     }
-
-    public FilmStorage getFilmStorage() {
-        return filmStorage;
-    }
-
-    public UserStorage getUserStorage() {
-        return userStorage;
-    }
 }

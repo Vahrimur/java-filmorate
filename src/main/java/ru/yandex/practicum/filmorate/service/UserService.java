@@ -91,8 +91,4 @@ public class UserService {
         }
         return mutualFriends;
     }
-
-    public UserStorage getUserStorage() {
-        return userStorage;
-    }
 }

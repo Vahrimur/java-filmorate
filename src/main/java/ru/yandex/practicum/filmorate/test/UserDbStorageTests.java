@@ -25,7 +25,7 @@ public class UserDbStorageTests {
 
     @DirtiesContext
     @Test
-    public void shouldAddAndGetUser() {
+    public void shouldAddAndGetUser() { //добавление пользователя и получение всех пользователей
         User user = new User(0, "email@yandex.ru", "login", "name",
                 LocalDate.of(1991, 6, 22), null, null);
         userStorage.addUser(user);
@@ -40,7 +40,7 @@ public class UserDbStorageTests {
 
     @DirtiesContext
     @Test
-    public void shouldDeleteUser() {
+    public void shouldDeleteUser() { //удаление пользователя
         User user = new User(0, "email@yandex.ru", "login", "name",
                 LocalDate.of(1991, 6, 22), null, null);
         userStorage.addUser(user);
@@ -54,7 +54,7 @@ public class UserDbStorageTests {
 
     @DirtiesContext
     @Test
-    public void shouldUpdateUser() {
+    public void shouldUpdateUser() { //обноваление пользователя
         User user = new User(0, "email@yandex.ru", "login", "name",
                 LocalDate.of(1991, 6, 22), null, null);
         userStorage.addUser(user);
@@ -71,7 +71,7 @@ public class UserDbStorageTests {
 
     @DirtiesContext
     @Test
-    public void shouldFindAllUsers() {
+    public void shouldFindAllUsers() { //поиск всех пользователей
         User user = new User(0, "email@yandex.ru", "login", "name",
                 LocalDate.of(1991, 6, 22), null, null);
         userStorage.addUser(user);

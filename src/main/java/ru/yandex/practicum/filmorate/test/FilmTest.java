@@ -12,7 +12,7 @@ public class FilmTest {
     @Test
     public void shouldValidate() {
         Film film = new Film(1, "", "description",
-                LocalDate.of(2002, 1, 1), 120, null);
+                LocalDate.of(2002, 1, 1), 120, null, null, null);
         ValidationException ex1 = assertThrows(
                 ValidationException.class,
                 () -> Film.validateFilm(film)

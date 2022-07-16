@@ -35,7 +35,7 @@ public class FilmController {
     @PutMapping //обновление фильма
     public Film update(@RequestBody Film film) {
         if (film.getId() < 0) {
-            throw new RuntimeException("Введён некорректный id.");
+            throw new IllegalArgumentException("Введён некорректный id.");
         }
         Film.validateFilm(film);
         Film updatedFilm = filmStorage.updateFilm(film);
@@ -81,6 +81,9 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}") //пользователь удаляет лайк
     public void deleteLike(@PathVariable long id, @PathVariable long userId) {
+        if (id < 0 || userId < 0) {
+            throw new IllegalArgumentException("Введён некорректный id.");
+        }
         filmService.deleteLike(id, userId);
         log.debug("Пользователь с id {} успешно удалил лайк фильму с id {}", userId, id);
     }

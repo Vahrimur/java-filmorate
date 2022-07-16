@@ -23,11 +23,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(Film film) {
+    public boolean deleteFilm(Film film) {
         if (!(films.containsValue(film))) {
             throw new ValidationException("Такого фильма нет в коллекции.");
         }
         films.remove(film.getId());
+        return true;
     }
 
     @Override

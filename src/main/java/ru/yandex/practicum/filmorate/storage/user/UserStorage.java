@@ -7,8 +7,11 @@ import java.util.Map;
 
 public interface UserStorage {
     User addUser(User user); //добавление пользователя
-    void deleteUser(User user); //удаление пользователя
+
+    boolean deleteUser(User user); //удаление пользователя
+
     User updateUser(User user); //модификация пользователя
+
     Collection<User> findAllUsers(); //поиск всех пользователей
 
     Map<Long, User> getUsers();

@@ -7,8 +7,11 @@ import java.util.Map;
 
 public interface FilmStorage {
     Film addFilm(Film film); //добавление фильма
-    void deleteFilm(Film film); //удаление фильма
+
+    boolean deleteFilm(Film film); //удаление фильма
+
     Film updateFilm(Film film); //модификация фильма
+
     Collection<Film> findAllFilms(); //поиск всех фильмов
 
     Map<Long, Film> getFilms();

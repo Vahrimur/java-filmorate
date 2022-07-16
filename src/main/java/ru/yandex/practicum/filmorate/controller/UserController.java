@@ -36,7 +36,7 @@ public class UserController {
     @PutMapping //обновление пользователя
     public User update(@RequestBody User user) {
         if (user.getId() < 0) {
-            throw new RuntimeException("Введён некорректный id.");
+            throw new IllegalArgumentException("Введён некорректный id.");
         }
         User.validateUser(user);
         User updatedUser = userStorage.updateUser(user);
@@ -46,6 +46,9 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}") //добавление в друзья
     public void addFriend(@PathVariable long id, @PathVariable long friendId) {
+        if (id < 0 || friendId < 0) {
+            throw new IllegalArgumentException("Введён некорректный id.");
+        }
         userService.addFriend(friendId, id);
         log.debug("Пользователь с id {} добавлен в друзья пользователю с id {}", friendId, id);
     }

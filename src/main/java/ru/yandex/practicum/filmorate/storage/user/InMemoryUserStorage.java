@@ -25,11 +25,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUser(User user) {
+    public boolean deleteUser(User user) {
         if (!(users.containsValue(user))) {
             throw new ValidationException("Такого пользователя не существует.");
         }
         users.remove(user.getId());
+        return true;
     }
 
     @Override

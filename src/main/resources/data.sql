@@ -12,3 +12,4 @@ INSERT INTO GENRES (name) VALUES ('Мультфильм');
 INSERT INTO GENRES (name) VALUES ('Триллер');
 INSERT INTO GENRES (name) VALUES ('Документальный');
 INSERT INTO GENRES (name) VALUES ('Боевик');
+

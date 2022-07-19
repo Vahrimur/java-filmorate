@@ -13,7 +13,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,17 +27,17 @@ public class FilmDbStorageTests {
     @DirtiesContext
     @Test
     public void shouldAddAndGetFilm() {
-        Genre g = new Genre(1, "Комедия");
-        ArrayList<Genre> genre = new ArrayList<>();
-        genre.add(g);
+        Genre genre = new Genre(1, "Комедия");
+        ArrayList<Genre> genres = new ArrayList<>();
+        genres.add(genre);
         Film film = new Film(1, "", "description",
-                LocalDate.of(2002, 1, 1), 120, new Mpa(1, "G"), null, Optional.of(genre));
+                LocalDate.of(2002, 1, 1), 120, new Mpa(1, "G"), null, Optional.of(genres));
         filmStorage.addFilm(film);
         filmStorage.addFilm(film);
-        Map<Long, Film> films = filmStorage.getFilms();
+        List<Film> films = filmStorage.getAllFilms();
         assertThat(films.size()).isEqualTo(2);
-        Film filmDb1 = films.get(1L);
-        Film filmDb2 = films.get(2L);
+        Film filmDb1 = films.get(0);
+        Film filmDb2 = films.get(1);
         assertThat(film.getId()).isNotEqualTo(filmDb1.getId());
         assertThat(filmDb2.getId()).isEqualTo(2);
         assertThat(filmDb1.getDescription()).isEqualTo("description");
@@ -46,18 +46,17 @@ public class FilmDbStorageTests {
     @DirtiesContext
     @Test
     public void shouldDeleteFilm() {
-        Genre g = new Genre(1, "Комедия");
-        ArrayList<Genre> genre = new ArrayList<>();
-        genre.add(g);
+        Genre genre = new Genre(1, "Комедия");
+        ArrayList<Genre> genres = new ArrayList<>();
+        genres.add(genre);
         Film film = new Film(1, "", "description",
-                LocalDate.of(2002, 1, 1), 120, new Mpa(1, "G"), null, Optional.of(genre));
+                LocalDate.of(2002, 1, 1), 120, new Mpa(1, "G"), null, Optional.of(genres));
         filmStorage.addFilm(film);
-        Map<Long, Film> films1 = filmStorage.getFilms();
+        List<Film> films1 = filmStorage.getAllFilms();
         assertThat(films1.size()).isEqualTo(1);
-        Film filmDb1 = films1.get(1L);
-        filmStorage.deleteFilm(filmDb1);
-        Map<Long, Film> films2 = filmStorage.getFilms();
+        Film filmDb1 = films1.get(0);
+        filmStorage.deleteFilm(1);
+        List<Film> films2 = filmStorage.getAllFilms();
         assertThat(films2.size()).isEqualTo(0);
     }
-
 }

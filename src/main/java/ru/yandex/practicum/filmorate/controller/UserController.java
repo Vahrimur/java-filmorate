@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -17,55 +16,42 @@ import java.util.Set;
 @Slf4j
 public class UserController {
     private final UserService userService;
-    private final UserStorage userStorage;
 
     @Autowired
-    public UserController(UserService userService, UserStorage userStorage) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userStorage = userStorage;
     }
 
     @PostMapping //создание пользователя
     public User create(@RequestBody User user) {
-        User.validateUser(user);
-        User addedUser = userStorage.addUser(user);
+        User addedUser = userService.addUser(user);
         log.debug("Пользователь добавлен: {}", addedUser);
         return addedUser;
     }
 
     @PutMapping //обновление пользователя
     public User update(@RequestBody User user) {
-        if (user.getId() < 0) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
-        User.validateUser(user);
-        User updatedUser = userStorage.updateUser(user);
+        User updatedUser = userService.updateUser(user);
         log.debug("Пользователь обновлён: {}", updatedUser);
         return updatedUser;
     }
 
     @PutMapping("/{id}/friends/{friendId}") //добавление в друзья
     public void addFriend(@PathVariable long id, @PathVariable long friendId) {
-        if (id < 0 || friendId < 0) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
         userService.addFriend(friendId, id);
         log.debug("Пользователь с id {} добавлен в друзья пользователю с id {}", friendId, id);
     }
 
     @GetMapping //получение списка всех пользователей
-    public Collection<User> findAll() {
-        Collection<User> users = userStorage.findAllUsers();
+    public List<User> findAll() {
+        List<User> users = userService.getAllUsers();
         log.debug("Текущее количество пользователей: {}", users.size());
         return users;
     }
 
     @GetMapping("/{userId}") //получение пользователя по id
     public User findById(@PathVariable long userId) {
-        if (!(userStorage.getUsers().containsKey(userId))) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
-        User user = userStorage.getUsers().get(userId);
+        User user = userService.getUserById(userId);
         log.debug("Получен пользователь: {}", user);
         return user;
     }

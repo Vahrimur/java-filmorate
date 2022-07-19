@@ -7,14 +7,12 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Primary
 public class GenreDbStorage implements GenreStorage {
+    private static final String GET_ALL = "SELECT * FROM GENRES";
     private final JdbcTemplate jdbcTemplate;
 
     public GenreDbStorage(JdbcTemplate jdbcTemplate) {
@@ -22,25 +20,26 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Collection<Genre> findAllGenres() {
-        String sqlQuery = "SELECT * FROM GENRES";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
+    public List<Genre> getAllGenres() {
+        return jdbcTemplate.query(GET_ALL, this::mapRowToGenre);
 
     }
 
     @Override
-    public Map<Integer, Genre> getGenres() {
-        String sqlQuery = "SELECT * FROM GENRES";
-        List<Genre> listGenre = jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
+    public Optional<Genre> getGenreById(int id) {
+        List<Genre> listGenre = getAllGenres();
         Map<Integer, Genre> mapGenre = new HashMap<>();
         for (Genre genre : listGenre) {
             mapGenre.put(genre.getId(), genre);
         }
-        return mapGenre;
+        if (mapGenre.containsKey(id)) {
+            return Optional.ofNullable(mapGenre.get(id));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        Genre genre = new Genre(resultSet.getInt("ID"), resultSet.getString("NAME"));
-        return genre;
+        return new Genre(resultSet.getInt("ID"), resultSet.getString("NAME"));
     }
 }

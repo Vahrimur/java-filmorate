@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.storage.mpa;
 
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 public interface MpaStorage {
-    Collection<Mpa> findAllMpas(); //поиск всех рейтингов mpa
+    List<Mpa> getAllMpas(); //поиск всех рейтингов mpa
 
-    Map<Integer, Mpa> getMpas();
+    Optional<Mpa> getMpaById(int id); //поиск рейтинга по id
 }

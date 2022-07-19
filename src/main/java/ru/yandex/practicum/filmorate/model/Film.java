@@ -42,6 +42,5 @@ public class Film {
         if (film.getGenres().isEmpty()) {
             film.setGenres(Optional.of(new ArrayList<>()));
         }
-
     }
 }

@@ -7,14 +7,12 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Primary
 public class MpaDbStorage implements MpaStorage {
+    private static final String GET_ALL = "SELECT * FROM RATINGS";
     private final JdbcTemplate jdbcTemplate;
 
     public MpaDbStorage(JdbcTemplate jdbcTemplate) {
@@ -22,25 +20,25 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public Collection<Mpa> findAllMpas() {
-        String sqlQuery = "SELECT * FROM RATINGS";
-
-        return jdbcTemplate.query(sqlQuery, this::mapRowToMpa);
+    public List<Mpa> getAllMpas() {
+        return jdbcTemplate.query(GET_ALL, this::mapRowToMpa);
     }
 
     @Override
-    public Map<Integer, Mpa> getMpas() {
-        String sqlQuery = "SELECT * FROM RATINGS";
-        List<Mpa> listMpa = jdbcTemplate.query(sqlQuery, this::mapRowToMpa);
+    public Optional<Mpa> getMpaById(int id) {
+        List<Mpa> listMpa = getAllMpas();
         Map<Integer, Mpa> mapMpa = new HashMap<>();
         for (Mpa mpa : listMpa) {
             mapMpa.put(mpa.getId(), mpa);
         }
-        return mapMpa;
+        if (mapMpa.containsKey(id)) {
+            return Optional.ofNullable(mapMpa.get(id));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
-        Mpa mpa = new Mpa(resultSet.getInt("ID"), resultSet.getString("NAME"));
-        return mpa;
+        return new Mpa(resultSet.getInt("ID"), resultSet.getString("NAME"));
     }
 }

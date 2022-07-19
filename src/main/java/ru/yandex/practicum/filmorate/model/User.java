@@ -19,7 +19,6 @@ public class User {
     private Set<Long> friends; // список с неповторяющимися (по ТЗ) id друзей пользователя (из таблицы, только подтвержденные друзья)
     private Set<Long> subscribers; // список с неповторяющимися (по ТЗ) id предложивших пользователю дружбу (из таблицы, только неподтвержденные друзья)
 
-
     public static void validateUser(User user) {
         if (user.getLogin() == null || user.getLogin().contains(" ") || user.getLogin().isBlank()) {
             throw new ValidationException("Логин не может быть пустым и содержать пробелы.");

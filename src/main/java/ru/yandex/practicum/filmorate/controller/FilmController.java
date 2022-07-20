@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.*;
 
@@ -16,29 +15,23 @@ import java.util.*;
 @Slf4j
 public class FilmController {
     private final FilmService filmService;
-    private final FilmStorage filmStorage;
+
 
     @Autowired
-    public FilmController(FilmService filmService, FilmStorage filmStorage) {
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
-        this.filmStorage = filmStorage;
     }
 
     @PostMapping() //добавление фильма
     public Film create(@RequestBody Film film) {
-        Film.validateFilm(film);
-        Film addedFilm = filmStorage.addFilm(film);
+        Film addedFilm = filmService.addFilm(film);
         log.debug("Фильм добавлен: {}", addedFilm);
         return addedFilm;
     }
 
     @PutMapping //обновление фильма
     public Film update(@RequestBody Film film) {
-        if (film.getId() < 0) {
-            throw new RuntimeException("Введён некорректный id.");
-        }
-        Film.validateFilm(film);
-        Film updatedFilm = filmStorage.updateFilm(film);
+        Film updatedFilm = filmService.updateFilm(film);
         log.debug("Фильм обновлён: {}", updatedFilm);
         return updatedFilm;
     }
@@ -50,30 +43,27 @@ public class FilmController {
     }
 
     @GetMapping() //получение всех фильмов
-    public Collection<Film> findAll() {
-        Collection<Film> films = filmStorage.findAllFilms();
+    public List<Film> findAll() {
+        List<Film> films = filmService.getAllFilms();
         log.debug("Текущее количество фильмов: {}", films.size());
         return films;
     }
 
     @GetMapping("/{filmId}") //получение фильма по id
     public Film findById(@PathVariable long filmId) {
-        if (!(filmStorage.getFilms().containsKey(filmId))) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
-        Film film = filmStorage.getFilms().get(filmId);
+        Film film = filmService.getFilmById(filmId);
         log.debug("Получен фильм: {}", film);
         return film;
     }
 
     @GetMapping("/popular") // возвращает список из count топ-фильмов
-    public ArrayList<Film> findPopularFilms(@RequestParam Optional<Integer> count) {
+    public List<Film> findPopularFilms(@RequestParam Optional<Integer> count) {
         if (count.isPresent()) {
-            ArrayList<Film> films = filmService.findPopularFilms(count.get());
+            List<Film> films = filmService.findPopularFilms(count.get());
             log.debug("Получен топ-{} фильмов", films.size());
             return films;
         } else {
-            ArrayList<Film> films = filmService.findPopularFilms(10);
+            List<Film> films = filmService.findPopularFilms(10);
             log.debug("Получен топ-{} фильмов", films.size());
             return films; //если count не задано, возвращает первые 10
         }
@@ -81,6 +71,9 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}") //пользователь удаляет лайк
     public void deleteLike(@PathVariable long id, @PathVariable long userId) {
+        if (id < 0 || userId < 0) {
+            throw new IllegalArgumentException("Введён некорректный id.");
+        }
         filmService.deleteLike(id, userId);
         log.debug("Пользователь с id {} успешно удалил лайк фильму с id {}", userId, id);
     }

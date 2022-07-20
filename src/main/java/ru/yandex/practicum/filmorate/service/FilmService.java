@@ -2,75 +2,76 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.likes.LikesService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final LikesService likesService;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, LikesService likesService) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.likesService = likesService;
     }
 
-    //добавление лайка
-    //каждый пользователь может поставить лайк фильму только один раз (по ТЗ)
+    public Film addFilm(Film film) {
+        Film.validateFilm(film);
+        return filmStorage.addFilm(film);
+    }
+
+    public Film updateFilm(Film film) {
+        if (film.getId() < 0) {
+            throw new IllegalArgumentException("Введён некорректный id.");
+        }
+        Film.validateFilm(film);
+        return filmStorage.updateFilm(film);
+    }
+
+    public void deleteFilm(long id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("Введён некорректный id.");
+        }
+        filmStorage.deleteFilm(id);
+    }
+
+    public List<Film> getAllFilms() {
+        return filmStorage.getAllFilms();
+    }
+
+    public Film getFilmById(long id) {
+        return filmStorage.getFilmById(id).orElseThrow(() -> new IllegalArgumentException(
+                "Фильма с таким id не существует"));
+    }
+
     public void addLike(long targetFilmId, long targetUserId) {
-        Map<Long, User> users = userStorage.getUsers();
-        Map<Long, Film> films = filmStorage.getFilms();
-        if (!(films.containsKey(targetFilmId)) || !(users.containsKey(targetUserId))) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
-        User targetUser = users.get(targetUserId);
-        Film targetFilm = films.get(targetFilmId);
-        if (targetFilm.getUserLikes().contains(targetUser.getId())) {
-            throw new ValidationException("Этот пользователь уже ставил лайк.");
-        }
-        targetFilm.getUserLikes().add(targetUser.getId());
+        validateFilmAndUser(targetFilmId, targetUserId);
+        likesService.addLike(targetFilmId, targetUserId);
     }
 
-    //удаление лайка
     public void deleteLike(long targetFilmId, long targetUserId) {
-        Map<Long, User> users = userStorage.getUsers();
-        Map<Long, Film> films = filmStorage.getFilms();
-        if (!(films.containsKey(targetFilmId)) || !(users.containsKey(targetUserId))) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
-        User targetUser = users.get(targetUserId);
-        Film targetFilm = films.get(targetFilmId);
-        if (!(targetFilm.getUserLikes().contains(targetUser.getId()))) {
-            throw new ValidationException("Этот пользователь не ставил лайк.");
-        }
-        targetFilm.getUserLikes().remove(targetUser.getId());
+        validateFilmAndUser(targetFilmId, targetUserId);
+        likesService.deleteLike(targetFilmId, targetUserId);
     }
 
-    //вывод n наиболее популярных фильмов по количеству лайков
-    public ArrayList<Film> findPopularFilms(int count) {
+    public List<Film> findPopularFilms(int count) {
         if (count < 0) {
             throw new IllegalArgumentException("Count не может быть отрицательным.");
         }
-        Comparator<Film> comparator = (f1, f2) -> {
-            int f1Likes = f1.getUserLikes().size();
-            int f2Likes = f2.getUserLikes().size();
-            return f1Likes - f2Likes;
-        };
+        return likesService.findPopularFilms(count);
+    }
 
-        Map<Long, Film> films = filmStorage.getFilms();
-        ArrayList<Film> popularFilms = new ArrayList<>(films.values());
-        popularFilms.sort(comparator.reversed());
-        if (films.size() < count) {
-            return popularFilms;
-        } else {
-            return (ArrayList<Film>) popularFilms.stream().limit(count).collect(Collectors.toList());
-        }
+    private void validateFilmAndUser(long filmId, long userId) {
+        filmStorage.getFilmById(filmId).orElseThrow(() ->
+                new IllegalArgumentException("Введён некорректный id фильма."));
+        userStorage.getUserById(userId).orElseThrow(() ->
+                new IllegalArgumentException("Введён некорректный id пользователя."));
     }
 }

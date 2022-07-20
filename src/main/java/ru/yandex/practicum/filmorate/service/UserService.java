@@ -4,91 +4,86 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.friends.FriendsService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserService {
     private final UserStorage userStorage;
+    private final FriendsService friendsService;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendsService friendsService) {
         this.userStorage = userStorage;
+        this.friendsService = friendsService;
     }
 
-    //добавление в друзья
-    //пользователи становятся друзьями друг у друга без подтверждения (по ТЗ)
-    public void addFriend(long newFriendId, long targetUserId) {
-        Map<Long, User> users = userStorage.getUsers();
-        if (!(users.containsKey(newFriendId)) || !(users.containsKey(targetUserId))) {
+    public User addUser(User user) {
+        User.validateUser(user);
+        return userStorage.addUser(user);
+    }
+
+
+    public User updateUser(User user) {
+        if (user.getId() < 0) {
             throw new IllegalArgumentException("Введён некорректный id.");
         }
+        User.validateUser(user);
+        return userStorage.updateUser(user);
+    }
+
+    public void deleteUser(long id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("Введён некорректный id.");
+        }
+        userStorage.deleteUser(id);
+    }
+
+    public List<User> getAllUsers() { //поиск всех пользователей
+        return userStorage.getAllUsers();
+    }
+
+    public User getUserById(long id) {
+        return userStorage.getUserById(id).orElseThrow(() -> new IllegalArgumentException(
+                "Пользователя с таким id не существует"));
+    }
+
+    public void addFriend(long newFriendId, long targetUserId) {
         if (newFriendId == targetUserId) {
             throw new IllegalArgumentException("Id не могут совпадать.");
         }
-        User newFriend = users.get(newFriendId);
-        User targetUser = users.get(targetUserId);
-        if (targetUser.getFriends().contains(newFriend.getId())) {
-            throw new ValidationException("Пользователи уже являются друзьями.");
-        }
-        newFriend.getFriends().add(targetUser.getId());
-        targetUser.getFriends().add(newFriend.getId());
+        validateUser(newFriendId);
+        validateUser(targetUserId);
+        friendsService.addFriend(newFriendId, targetUserId);
     }
 
-    //удаление из друзей
     public void deleteFriend(long friendUserId, long targetUserId) {
-        Map<Long, User> users = userStorage.getUsers();
-        if (!(users.containsKey(friendUserId)) || !(users.containsKey(targetUserId))) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
         if (friendUserId == targetUserId) {
             throw new ValidationException("Пользователи должны быть разными.");
         }
-        User friendUser = users.get(friendUserId);
-        User targetUser = users.get(targetUserId);
-        if (!(targetUser.getFriends().contains(friendUser.getId()))) {
-            throw new ValidationException("Пользователи не являются друзьями.");
-        }
-        friendUser.getFriends().remove(targetUser.getId());
-        targetUser.getFriends().remove(friendUser.getId());
+        validateUser(friendUserId);
+        validateUser(targetUserId);
+        friendsService.deleteFriend(friendUserId, targetUserId);
     }
 
-    //вывод списка друзей пользователя
     public Set<User> findUserFriends(long targetUserId) {
-        Map<Long, User> users = userStorage.getUsers();
-        if (!(users.containsKey(targetUserId))) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
-        Set<User> friends = new HashSet<>();
-        User targetUser = users.get(targetUserId);
-        for (Long id : targetUser.getFriends()) {
-            friends.add(users.get(id));
-        }
-        return friends;
+        validateUser(targetUserId);
+        return friendsService.findUserFriends(targetUserId);
     }
 
-    //вывод списка общих друзей
     public Set<User> findMutualFriends(long targetUser1Id, long targetUser2Id) {
-        Map<Long, User> users = userStorage.getUsers();
-        if (!(users.containsKey(targetUser1Id)) || !(users.containsKey(targetUser2Id))) {
-            throw new IllegalArgumentException("Введён некорректный id.");
-        }
+        validateUser(targetUser1Id);
+        validateUser(targetUser2Id);
         if (targetUser1Id == targetUser2Id) {
             throw new ValidationException("Пользователи должны быть разные");
         }
-        Set<User> mutualFriends = new HashSet<>();
-        User targetUser1 = users.get(targetUser1Id);
-        User targetUser2 = users.get(targetUser2Id);
-        for (long id1 : targetUser1.getFriends()) {
-            for (long id2 : targetUser2.getFriends()) {
-                if (id1 == id2) {
-                    mutualFriends.add(users.get((id1)));
-                }
-            }
-        }
-        return mutualFriends;
+        return friendsService.findMutualFriends(targetUser1Id, targetUser2Id);
+    }
+
+    private void validateUser(long userId) {
+        userStorage.getUserById(userId).orElseThrow(() ->
+                new IllegalArgumentException("Введён некорректный id пользователя."));
     }
 }

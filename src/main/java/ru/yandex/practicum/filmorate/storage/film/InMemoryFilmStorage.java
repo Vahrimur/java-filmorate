@@ -9,7 +9,7 @@ import java.util.*;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private long id = 0;
-    private final Map<Long, Film> films = new HashMap<>(); //<id, film>
+    private final Map<Long, Film> films = new HashMap<>();
 
     private long makeId() {
         return ++id;
@@ -22,13 +22,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    @Override
-    public void deleteFilm(Film film) {
-        if (!(films.containsValue(film))) {
-            throw new ValidationException("Такого фильма нет в коллекции.");
-        }
-        films.remove(film.getId());
-    }
 
     @Override
     public Film updateFilm(Film film) {
@@ -43,12 +36,20 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> findAllFilms() {
-        return films.values();
+    public void deleteFilm(long id) {
+        if (!(films.containsKey(id))) {
+            throw new ValidationException("Такого фильма нет в коллекции."); //пернести валидацию в сервис
+        }
+        films.remove(id);
     }
 
     @Override
-    public Map<Long, Film> getFilms() {
-        return films;
+    public List<Film> getAllFilms() {
+        return new ArrayList<>(films.values());
+    }
+
+    @Override
+    public Optional<Film> getFilmById(long id) {
+        return Optional.of(films.get(id));
     }
 }

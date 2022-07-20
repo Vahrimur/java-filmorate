@@ -4,14 +4,12 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private long id = 0;
-    private final Map<Long, User> users = new HashMap<>(); //<id, user>
+    private final Map<Long, User> users = new HashMap<>();
 
     private long makeId() {
         return ++id;
@@ -22,14 +20,6 @@ public class InMemoryUserStorage implements UserStorage {
         user.setId(makeId());
         users.put(user.getId(), user);
         return user;
-    }
-
-    @Override
-    public void deleteUser(User user) {
-        if (!(users.containsValue(user))) {
-            throw new ValidationException("Такого пользователя не существует.");
-        }
-        users.remove(user.getId());
     }
 
     @Override
@@ -45,12 +35,20 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> findAllUsers() {
-        return users.values();
+    public void deleteUser(long id) {
+        if (!(users.containsKey(id))) {
+            throw new ValidationException("Такого пользователя не существует.");
+        }
+        users.remove(id);
     }
 
     @Override
-    public Map<Long, User> getUsers() {
-        return users;
+    public List<User> getAllUsers() {
+        return new ArrayList<>(users.values());
+    }
+
+    @Override
+    public Optional<User> getUserById(long id) {
+        return Optional.of(users.get(id));
     }
 }

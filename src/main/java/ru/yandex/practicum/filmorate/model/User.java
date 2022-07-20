@@ -16,7 +16,8 @@ public class User {
     private String login; // логин пользователя
     private String name; // имя для отображения
     private LocalDate birthday; //день рождения
-    private Set<Long> friends; // список с неповторяющимися (по ТЗ) id друзей пользователя
+    private Set<Long> friends; // список с неповторяющимися (по ТЗ) id друзей пользователя (из таблицы, только подтвержденные друзья)
+    private Set<Long> subscribers; // список с неповторяющимися (по ТЗ) id предложивших пользователю дружбу (из таблицы, только неподтвержденные друзья)
 
     public static void validateUser(User user) {
         if (user.getLogin() == null || user.getLogin().contains(" ") || user.getLogin().isBlank()) {
@@ -33,6 +34,9 @@ public class User {
         }
         if (user.getFriends() == null) {
             user.setFriends(new HashSet<>());
+        }
+        if (user.getSubscribers() == null) {
+            user.setSubscribers(new HashSet<>());
         }
     }
 }

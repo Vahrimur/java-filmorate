@@ -43,10 +43,10 @@ public class FilmController {
     }
 
     @GetMapping() //получение всех фильмов
-    public Collection<Film> findAll() {
-        Collection<Film> films = filmService.getAllFilms();
+    public List<Film> findAll() {
+        List<Film> films = filmService.getAllFilms();
         log.debug("Текущее количество фильмов: {}", films.size());
-        return films; //change type of data
+        return films;
     }
 
     @GetMapping("/{filmId}") //получение фильма по id

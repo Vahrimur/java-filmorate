@@ -33,7 +33,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User addUser(User user) { //добавление пользователя
+    public User addUser(User user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -50,7 +50,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) { //модификация пользователя
+    public User updateUser(User user) {
         jdbcTemplate.update(UPDATE_USER,
                 user.getLogin(),
                 user.getEmail(),

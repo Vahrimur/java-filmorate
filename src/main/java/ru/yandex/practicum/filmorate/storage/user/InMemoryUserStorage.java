@@ -9,7 +9,7 @@ import java.util.*;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private long id = 0;
-    private final Map<Long, User> users = new HashMap<>(); //<id, user>
+    private final Map<Long, User> users = new HashMap<>();
 
     private long makeId() {
         return ++id;
